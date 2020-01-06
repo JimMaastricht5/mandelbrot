@@ -1,31 +1,35 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib import colors
-# %matplotlib inline
+from PIL import Image,  ImageDraw
 
-def mandelbrot(creal,cimag,maxiter):
+#mandelbrot set is defined by a set of complex number C for which the
+#sequence F(Z) remains bounded by a value (say 4) after a maximum set of iterations.
+#where F(Z)= Z^2 + C
+#
+def mandelbrot(creal, cimaginary, maxiterations):
     real = creal
-    imag = cimag
-    for n in range(maxiter):
+    imag = cimaginary
+    for n in range(maxiterations):
         real2 = real*real
         imag2 = imag*imag
         if real2 + imag2 > 4.0:
-            return n
-        imag = 2* real*imag + cimag
+           return n
+        imag = 2 * real * imag + cimaginary
         real = real2 - imag2 + creal
     return 0
 
 
 
-def mandelbrot_set(xmin,xmax,ymin,ymax,width,height,maxiter):
-    r1 = np.linspace(xmin, xmax, width)
-    r2 = np.linspace(ymin, ymax, height)
-    n3 = np.empty((width,height))
+def mandelbrot_set(xmin, xmax, ymin, ymax, image_width, image_height, maxiter):
+    #create spaced values from x and y min and max values using the height and width specified for the image
+    rx = np.linspace(xmin, xmax, image_width)
+    ry = np.linspace(ymin, ymax, image_height)
+    rgb = np.empty((image_width, image_height))
 
-    for i in range(width):
-        for j in range(height):
-            n3[i,j] = mandelbrot(r1[i],r2[j],maxiter)
-    return (r1,r2,n3)
+    #iterate through each pixel of the image and set the RGB value
+    for i in range(image_width):
+        for j in range(image_height):
+            rgb[i, j] = mandelbrot(rx[i], ry[j], maxiter)
+    return (rx, ry, rgb)
 
 
 def mandelbrot_image(xmin, xmax, ymin, ymax, width=10, height=10, maxiter=256):
@@ -33,16 +37,25 @@ def mandelbrot_image(xmin, xmax, ymin, ymax, width=10, height=10, maxiter=256):
     img_width = dpi * width
     img_height = dpi * height
     x, y, z = mandelbrot_set(xmin, xmax, ymin, ymax, img_width, img_height, maxiter)
-    print('returned')
-    fig, ax = plt.subplots(figsize=(width, height), dpi=72)
-    ticks = np.arange(0, img_width, 3 * dpi)
-    x_ticks = xmin + (xmax - xmin) * ticks / img_width
-    plt.xticks(ticks, x_ticks)
-    y_ticks = ymin + (ymax - ymin) * ticks / img_width
-    plt.yticks(ticks, y_ticks)
-    ax.imshow(z.T, origin='lower')
+
+    #setup image
+    im= Image.new('RGB', (img_width, img_height), (0,0,0))
+    draw = ImageDraw.Draw(im)
+
+    for i in range(0, img_width):
+        for j in range(0, img_height):
+            color = int(z[i,j])
+            # BW version
+            #draw.point([i,j], (color, color, color))
+            #color version
+            hue = int(255 * color / maxiter)
+            saturation = 255
+            value = 255 if color < maxiter else 0
+            draw.point([i,j], (hue, saturation, value))
+
+    im.convert('RGB').save('output.png', 'PNG')
     return()
 
 # main program
-# mandelbrot_set(-2.0, 0.5, -1.25, 1.25, 1000,1000,80)
+#mandelbrot_set(-2.0, 0.5, -1.25, 1.25, 1000,1000,80)
 mandelbrot_image(-2.0,0.5,-1.25,1.25)
