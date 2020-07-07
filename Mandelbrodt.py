@@ -16,7 +16,6 @@ def mandelbrot(creal,cimag,maxiter):
     return 0
 
 
-
 def mandelbrot_set(xmin,xmax,ymin,ymax,width,height,maxiter):
     r1 = np.linspace(xmin, xmax, width)
     r2 = np.linspace(ymin, ymax, height)
@@ -43,6 +42,19 @@ def mandelbrot_image(xmin, xmax, ymin, ymax, width=10, height=10, maxiter=256):
     ax.imshow(z.T, origin='lower')
     return()
 
-# main program
+
+# main program: sample run time code below
+# takes four arguements with arguement 0 being the name of this module
 # mandelbrot_set(-2.0, 0.5, -1.25, 1.25, 1000,1000,80)
-mandelbrot_image(-2.0,0.5,-1.25,1.25)
+# mandelbrot_image(-2.0,0.5,-1.25,1.25)
+main():
+    if len(sys.argv) > 4: 
+        xmin, xmax, ymin, ymax = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    else:
+        xmin, xmax, ymin, ymax = -2.0, 0.5, -1.25, 1.25
+        
+    mandelbrot_image(xmin, xmax, ymin, ymax)
+    
+    
+if _name_ = '_main_':
+    main()
